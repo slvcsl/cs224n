@@ -24,6 +24,27 @@ def softmax(x):
     """
 
     ### YOUR CODE HERE
+    '''
+    if len(x.shape) > 1:
+        # Matrix
+        ### YOUR CODE HERE
+        x = x - np.max(x, axis = 1).reshape(-1,1)    
+        x = np.exp(x)
+        x = x / np.sum(x, axis = 1).reshape(-1,1)
+        ### END YOUR CODE
+    else:
+        # Vector
+        ### YOUR CODE HERE
+        x = x - np.max(x)
+        x = np.exp(x)
+        x = x / np.sum(x)        ### END YOUR CODE
+
+    assert x.shape == orig_shape
+    return x
+    '''
+    x -= tf.reduce_max(tf.abs(x), axis = 1) # for numerical stability, subtract max from x for each feature
+    x = tf.exp(x)
+    out = x/tf.reduce_sum(x, axis = 0)
     ### END YOUR CODE
 
     return out
@@ -54,6 +75,7 @@ def cross_entropy_loss(y, yhat):
     """
 
     ### YOUR CODE HERE
+    out = -tf.reduce_sum(tf.reduce_sum(tf.to_float(y)*tf.log(yhat), axis = 1), axis = 0)
     ### END YOUR CODE
 
     return out

@@ -42,9 +42,9 @@ def softmax(x):
     assert x.shape == orig_shape
     return x
     '''
-    x -= tf.reduce_max(tf.abs(x), axis = 1) # for numerical stability, subtract max from x for each feature
+    x -= tf.reduce_max(x, axis=1, keep_dims=True) # for numerical stability, subtract max from x for each feature
     x = tf.exp(x)
-    out = x/tf.reduce_sum(x, axis = 0)
+    out = x/tf.reduce_sum(x, axis = 1, keep_dims=True)
     ### END YOUR CODE
 
     return out

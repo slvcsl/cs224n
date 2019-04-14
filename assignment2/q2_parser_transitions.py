@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class PartialParse(object):
     def __init__(self, sentence):
         """Initializes this partial parse.
@@ -21,16 +23,37 @@ class PartialParse(object):
         self.sentence = sentence
 
         ### YOUR CODE HERE
+        self.stack = ["ROOT"]
+        self.buffer = list(sentence) #or the inpput sentence would be modified (!)
+        self.dependencies = []
         ### END YOUR CODE
 
     def parse_step(self, transition):
         """Performs a single parse step by applying the given transition to this partial parse
 
         Args:
-            transition: A string that equals "S", "LA", or "RA" representing the shift, left-arc,
+            transition: A string that equals "S", "LA", or: "RA" representing the shift, left-arc,
                         and right-arc transitions.
         """
         ### YOUR CODE HERE
+        if transition == "S":
+            if self.buffer:
+                w = self.buffer.pop(0)
+                self.stack.append(w)
+                
+        elif transition == "LA":
+            w1 = self.stack[-1] # must be kept in stack
+            w2 = self.stack.pop(-2)
+            transition = (w1, w2)
+            self.dependencies.append(transition)
+        
+        elif transition == "RA":
+            w1 = self.stack.pop(-1)
+            w2 = self.stack[-1]
+            transition = (w2, w1)
+            self.dependencies.append(transition)
+        
+                
         ### END YOUR CODE
 
     def parse(self, transitions):

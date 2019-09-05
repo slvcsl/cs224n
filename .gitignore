@@ -3,4 +3,4 @@ assignment2/data/
 assignment3/data/
 assignment3/results/
 *.pyc
-
+*.pkl

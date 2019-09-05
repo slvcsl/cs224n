@@ -3,6 +3,7 @@
 """
 Q1: A window into NER
 """
+
 from __future__ import absolute_import
 from __future__ import division
 
@@ -12,6 +13,7 @@ import time
 import logging
 from datetime import datetime
 
+import numpy as np
 import tensorflow as tf
 
 from util import print_sentence, write_conll
@@ -35,11 +37,10 @@ class Config:
     """
     n_word_features = 2 # Number of features for every word in the input.
     window_size = 1 # The size of the window to use.
-    
     ### YOUR CODE HERE
-    n_window_features = (2*window_size+1)*n_word_features # The total number of features used for each window.
+    # The total number of features used for each window.
+    n_window_features = (2 * window_size + 1) * n_word_features
     ### END YOUR CODE
-    
     n_classes = 5
     dropout = 0.5
     embed_size = 50
@@ -58,7 +59,6 @@ class Config:
         self.eval_output = self.output_path + "results.txt"
         self.log_output = self.output_path + "log"
         self.conll_output = self.output_path + "window_predictions.conll"
-
 
 def make_windowed_data(data, start, end, window_size = 1):
     """Uses the input sequences in @data to construct new windowed data points.
@@ -151,7 +151,7 @@ class WindowModel(NERModel):
         ### YOUR CODE HERE (~3-5 lines)
         self.input_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.n_window_features))
         self.labels_placeholder = tf.placeholder(tf.int32, shape=(None,))
-        self.dropout_placeholder = tf.placeholder(tf.float32, shape=None)
+        self.dropout_placeholder = tf.placeholder(tf.float32, shape=())
         ### END YOUR CODE
 
     def create_feed_dict(self, inputs_batch, labels_batch=None, dropout=1):
@@ -176,7 +176,7 @@ class WindowModel(NERModel):
         ### YOUR CODE HERE (~5-10 lines)
         feed_dict = {
             self.input_placeholder: inputs_batch,
-            self.dropout_placeholder: dropout,
+            self.dropout_placeholder: dropout
         }
         if labels_batch is not None:
             feed_dict[self.labels_placeholder] = labels_batch
@@ -237,7 +237,7 @@ class WindowModel(NERModel):
         b1 = tf.get_variable("b1", dtype=tf.float32, shape=(self.config.hidden_size), initializer=tf.zeros_initializer())
         z = tf.matmul(self.add_embedding(), W) + b1
         h = tf.nn.relu(z)
-        h_drop = tf.nn.dropout(h, keep_prob=(1-dropout_rate))
+        h_drop = tf.nn.dropout(h, dropout_rate)
         U = tf.get_variable("U", shape=(self.config.hidden_size, self.config.n_classes), dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer())
         b2 = tf.get_variable("b2", shape=(self.config.n_classes), dtype=tf.float32, initializer=tf.zeros_initializer())
         pred = tf.add(tf.matmul(h_drop, U), b2)
